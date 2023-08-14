@@ -34,12 +34,20 @@ namespace branding
 			if (font)
 			{
 #ifdef DEBUG
+<<<<<<< HEAD
 				game::R_AddCmdDrawText("h1-mod: " VERSION " (" __DATE__ " " __TIME__ ")", 
+=======
+				game::R_AddCmdDrawText("", //Ahrimdon
+>>>>>>> d24c2a3 (Removed watermark and auto-updater)
 					0x7FFFFFFF, font, 10.f,
 					5.f + static_cast<float>(font->pixelHeight), 
 					1.f, 1.f, 0.0f, color, 0);
 #else
+<<<<<<< HEAD
 				game::R_AddCmdDrawText("h1-mod",
+=======
+				game::R_AddCmdDrawText("", //Ahrimdon
+>>>>>>> d24c2a3 (Removed watermark and auto-updater)
 					0x7FFFFFFF, font, 10.f,
 					5.f + static_cast<float>(font->pixelHeight), 
 					1.f, 1.f, 0.0f, color, 0);

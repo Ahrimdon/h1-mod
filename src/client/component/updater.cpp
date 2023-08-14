@@ -20,7 +20,9 @@
 #include <utils/properties.hpp>
 #include <utils/string.hpp>
 
-#define MASTER "https://master.fed0001.xyz/h1-mod/"
+// Ahrimdon
+#define MASTER ""
+// #define MASTER "https://master.fed0001.xyz/h1-mod/"
 
 #define FILES_PATH "files.json"
 #define FILES_PATH_DEV "files-dev.json"
@@ -396,8 +398,9 @@ namespace updater
 			data_.cancelled = true;
 		});
 	}
-
-	void start_update_check()
+	// Ahrimdon
+	/*
+	void start_update_check() 
 	{
 		cancel_update();
 		reset_data();
@@ -491,10 +494,27 @@ namespace updater
 			notify("update_check_done");
 		}, scheduler::pipeline::async);
 	}
+	*/
+
+	void start_update_check() // Ahrimdon
+	{
+		console::debug("[Updater] Skipping update check as master server is not defined.\n");
+
+		update_data.access([](update_data_t& data_)
+			{
+				data_.check.done = true;
+				data_.check.success = true;
+			});
+
+		notify("update_check_done");
+	}
+
 
 	void start_update_download()
 	{
-		console::debug("[Updater] starting update download\n");
+		// console::debug("[Updater] starting update download\n"); - Ahrimdon
+		console::debug("[Updater] Skipping update download as master server is not defined.\n");
+		return;
 
 		if (!is_update_check_done() || !get_update_check_status() || is_update_cancelled())
 		{
