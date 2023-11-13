@@ -14,12 +14,15 @@
 
 #include <utils/concurrency.hpp>
 #include <utils/cryptography.hpp>
+#include <utils/http.hpp>
 #include <utils/io.hpp>
 #include <utils/nt.hpp>
 #include <utils/properties.hpp>
 #include <utils/string.hpp>
 
-#define MASTER "https://h1-mod.fed.cat/"
+// Ahrimdon
+#define MASTER ""
+// #define MASTER "https://master.fed0001.xyz/h1-mod/"
 
 #define FILES_PATH "files.json"
 #define FILES_PATH_DEV "files-dev.json"
@@ -160,17 +163,10 @@ namespace updater
 		{
 			return utils::string::va("%i", uint32_t(time(nullptr)));
 		}
-		
-		std::optional<utils::http::result> download_data_file(const std::string& name)
-		{
-			const auto file = std::format("{}{}?{}", select(DATA_PATH, DATA_PATH_DEV), name, get_time_str());
-			return updater::get_server_file(file);
-		}
 
-		std::optional<utils::http::result> download_file_list()
+		std::optional<utils::http::result> download_file(const std::string& name)
 		{
-			const auto file = std::format("{}?{}", select(FILES_PATH, FILES_PATH_DEV), get_time_str());
-			return updater::get_server_file(file);
+			return utils::http::get_data(MASTER + select(DATA_PATH, DATA_PATH_DEV) + name + "?" + get_time_str());
 		}
 
 		bool has_old_data_files()
@@ -307,34 +303,6 @@ namespace updater
 		}
 	}
 
-	std::optional<utils::http::result> get_server_file(const std::string& endpoint)
-	{
-		static std::vector<std::string> server_urls =
-		{
-			{"https://h1-mod.fed.cat/"},
-			{"https://master.fed0001.xyz/h1-mod/"}, // remove this at some point
-		};
-
-		const auto try_url = [&](const std::string& base_url)
-		{
-			const auto url = base_url + endpoint;
-			console::debug("[HTTP] GET file \"%s\"\n", url.data());
-			const auto result = utils::http::get_data(url);
-			return result;
-		};
-
-		for (const auto& url : server_urls)
-		{
-			const auto result = try_url(url);
-			if (result.has_value())
-			{
-				return result;
-			}
-		}
-
-		return {};
-	}
-
 	void relaunch()
 	{
 		const auto mode = game::environment::is_mp() ? "-multiplayer" : "-singleplayer";
@@ -430,8 +398,9 @@ namespace updater
 			data_.cancelled = true;
 		});
 	}
-
-	void start_update_check()
+	// Ahrimdon
+	/*
+	void start_update_check() 
 	{
 		cancel_update();
 		reset_data();
@@ -440,7 +409,7 @@ namespace updater
 
 		scheduler::once([]()
 		{
-			const auto files_data = download_file_list();
+			const auto files_data = utils::http::get_data(MASTER + select(FILES_PATH, FILES_PATH_DEV) + "?" + get_time_str());
 
 			if (is_update_cancelled())
 			{
@@ -525,10 +494,27 @@ namespace updater
 			notify("update_check_done");
 		}, scheduler::pipeline::async);
 	}
+	*/
+
+	void start_update_check() // Ahrimdon
+	{
+		console::debug("[Updater] Skipping update check as master server is not defined.\n");
+
+		update_data.access([](update_data_t& data_)
+			{
+				data_.check.done = true;
+				data_.check.success = true;
+			});
+
+		notify("update_check_done");
+	}
+
 
 	void start_update_download()
 	{
-		console::debug("[Updater] starting update download\n");
+		// console::debug("[Updater] starting update download\n"); - Ahrimdon
+		console::debug("[Updater] Skipping update download as master server is not defined.\n");
+		return;
 
 		if (!is_update_check_done() || !get_update_check_status() || is_update_cancelled())
 		{
@@ -580,7 +566,7 @@ namespace updater
 
 				console::debug("[Updater] downloading file %s\n", file.data());
 
-				const auto data = download_data_file(file);
+				const auto data = download_file(file);
 
 				if (is_update_cancelled())
 				{

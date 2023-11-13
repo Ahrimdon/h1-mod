@@ -31,30 +31,20 @@ namespace branding
 		void draw_branding()
 		{
 			const auto font = game::R_RegisterFont("fonts/fira_mono_bold.ttf", 22);
-			if (!font)
+			if (font)
 			{
-				return;
-			}
-
 #ifdef DEBUG
-			const auto text = "h1-mod: " VERSION " (" __DATE__ " " __TIME__ ")";
+				game::R_AddCmdDrawText("", //Ahrimdon
+					0x7FFFFFFF, font, 10.f,
+					5.f + static_cast<float>(font->pixelHeight), 
+					1.f, 1.f, 0.0f, color, 0);
 #else
-			const auto text = "h1-mod: " VERSION;
+				game::R_AddCmdDrawText("", //Ahrimdon
+					0x7FFFFFFF, font, 10.f,
+					5.f + static_cast<float>(font->pixelHeight), 
+					1.f, 1.f, 0.0f, color, 0);
 #endif
-
-			const auto placement = game::ScrPlace_GetViewPlacement();
-			float text_color[4] = {0.6f, 0.6f, 0.6f, 0.6f};
-
-			game::rectDef_s rect{};
-			rect.x = 0;
-			rect.y = 0;
-			rect.w = 500;
-			rect.horzAlign = 0;
-			rect.vertAlign = 0;
-
-			game::rectDef_s text_rect{};
-
-			game::UI_DrawWrappedText(placement, text, &rect, font, -102.5f, 10.f, 0.17f, text_color, 0, 0, &text_rect, 0);
+			}
 		}
 	}
 
